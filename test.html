@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="js/jquery-2.1.4.min.js"></script>
+
+    <script>
+      var myInput;
+
+      (function (window, $, undefined) {
+        $(function () {
+          myInput = document.getElementById("myFileInput");
+          myInput.addEventListener("change", sendPic, false);
+        });
+      })(window, window.jQuery);
+
+      function uploadToServer(file) {
+        //var image = imagen.toDataURL("image/png");
+
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+          var image = reader.result;
+
+          image = image.replace(/^data:(.*,)?/, "");
+          /*
+                if ((image.length % 4) > 0) {
+                    image += '='.repeat(4 - (image.length % 4));
+                }
+                */
+
+          var jsonData =
+            '{"idtrx":"5544","externaltrxid":"dfgdf","imgPDF":"ff"}';
+          var myurl =
+            "https://services.4i4id.com/2qrcomponentbna/api4i/v1/doc-reader-pdf";
+
+          $.post(
+            "https://capturadoc4i.azurewebsites.net/Home/OnScan",
+            { imageData: image },
+            function (data, status) {
+              alert("FROM SERVER:" + data);
+            }
+          );
+
+          /*
+                var jsonData = '{"idtrx":"5544","externaltrxid":"dfgdf","imgPDF":"ff"}';
+                var myurl = 'https://services.4i4id.com/2qrcomponentbna/api4i/v1/doc-reader-pdf';
+
+                alert('jasonData: ' + jsonData);
+                alert('url: ' + myurl);
+
+                $.post(myurl, jsonData,
+                    success: function (response) {
+                        alert('resposne: ' + response);
+                    }
+                );
+                */
+        };
+        reader.onerror = function (error) {
+          alert("Error base64: ", error);
+        };
+      }
+
+      function sendPic() {
+        var file = myInput.files[0];
+        uploadToServer(file);
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Tomar foto manualmente</h1>
+    <br />
+    <p>Disculpe, no hemos podido dtectar automaticamente su DNI.</p>
+    <p>
+      Tome una foto del mismo con su camara presionando el boton "Tomar foto".
+    </p>
+    <p>Fijese que la imagen salga clara, sin sombras y haga foco.</p>
+    <br />
+
+    <form action="" method="POST">
+      <input
+        id="myFileInput"
+        type="file"
+        name="file"
+        accept="image/*"
+        capture="user"
+      />
+      <input id="myFileInputBot" type="button" onclick="sendPic()" />
+    </form>
+  </body>
+</html>
